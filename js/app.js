@@ -105,8 +105,8 @@ function App() {
 (async function start() {
   render(html`<${App}/>`, document.getElementById('app'));
   try {
-    const [idx] = await Promise.all([fetchJson('data/index.json'), Store.init()]);
-    S.idx = idx;
+    const [idx, fixes] = await Promise.all([fetchJson('data/index.json'), fetchJson('data/fixes.json').catch(() => ({})), Store.init()]);
+    S.idx = idx; S.fixes = fixes.d || {};
   } catch (e) { S.loadErr = 'The school register didn’t load. Check your connection and reload the page.'; S.place = { label: '' }; emit(); return; }
   if (!S.me.children.length) { const c = { id: uid(), name: '', cls: '', board: '', job: '', budget: 'any', gender: '' }; S.me.children.push(c); S.me.active = c.id; }
   emit();

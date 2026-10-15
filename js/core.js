@@ -102,6 +102,7 @@ async function choosePlace(opt, keepArea) {
       blk.s.forEach(r => {
         const s = { n: r[0], id: r[1], lat: r[2] / 1e4, lon: r[3] / 1e4, cf: r[4], ct: r[5], fl: r[6], mg: r[7], bs: r[8], bh: r[9], t: r[10], st: r[11], y: r[12], pin: r[13], loc: r[14] >= 0 ? blk.l[r[14]] : '', rooms: r[15], di, state: st };
         if (!r[2]) { s.lat = 0; s.lon = 0; }
+        const fx = S.fixes && S.fixes[s.id]; if (fx) { s.lat = fx[0]; s.lon = fx[1]; s.fixed = true; }   // the register's map point is sometimes far off; corrections live in data/fixes.json
         schools.push(s);
         if (s.lat) {
           if (s.loc) { const k = s.loc + '|' + di; const a = areas.get(k) || { label: s.loc, sub: di, n: 0, la: 0, lo: 0, kind: 'area' }; a.n++; a.la += s.lat; a.lo += s.lon; areas.set(k, a); }
@@ -178,6 +179,21 @@ function evaluate(s, ch, home, f) {
   if (s.fl & 4) R.push(['info', 'Girls’ school']); else if (s.fl & 8) R.push(['info', 'Boys’ school']);
   if (s.t > 0 && s.st > 20) { const r = s.st / s.t; if (r <= 25) { pts += 5; R.push(['good', '1 teacher per ' + Math.round(r) + ' students']); } else if (r > 40) R.push(['ask', '1 teacher per ' + Math.round(r) + ' students']); }
   return { s, d, score: Math.round(clamp(pts / max, 0, 1) * 100), reasons: R };
+}
+// Why evaluate() leaves a school out, in words a parent can act on
+function whyHidden(s, ch, home, f) {
+  const out = [], kind = KIND[s.mg], cls = ch && ch.cls != null && ch.cls !== '' ? +ch.cls : null;
+  if (!f.kinds[kind]) out.push(KIND_LABEL[kind] + ' schools are turned off in the filters');
+  if (f.urbanOnly && !(s.fl & 1)) out.push('The register lists it as rural, and “urban only” is on');
+  if (ch && ch.gender === 'boy' && (s.fl & 4)) out.push('It’s a girls’ school');
+  if (ch && ch.gender === 'girl' && (s.fl & 8)) out.push('It’s a boys’ school');
+  if (cls != null && f.offersClass && !offers(s, cls)) out.push('The register says it doesn’t have ' + classLabel(cls) + ' (it lists ' + (s.cf === 0 ? 'Nursery' : 'Class ' + s.cf) + ' to ' + s.ct + ')');
+  if (f.board && !boardsOf(s).has(f.board)) out.push(boardsOf(s).size ? 'Its board isn’t ' + (BOARD_SHORT[f.board] || f.board) : 'Its board isn’t recorded, and the board filter is on');
+  if (home) {
+    if (!s.lat) { if (f.maxKm < 50) out.push('The register has no map location for it, so its distance is unknown'); }
+    else { const d = km(home.lat, home.lon, s.lat, s.lon); if (d > f.maxKm) out.push('The register puts it ' + d.toFixed(1) + ' km away, beyond your ' + f.maxKm + ' km limit'); }
+  }
+  return out;
 }
 function results() {
   if (!S.schools.length) return { list: [], stats: null };

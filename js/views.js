@@ -147,6 +147,7 @@ function Find() {
               <${Rings} list=${R.list}/>
             </div>
             ${!S.home ? html`<div class="notice info">${I('pin')}<span>Add the area or PIN code of your new home above to sort schools by distance. Until then they’re ranked on class, board and fees only.</span></div>` : null}
+            <${NameFind} list=${R.list}/>
             <div class="listhead"><h2>${fmtN(R.list.length)} ${R.list.length === 1 ? 'school fits' : 'schools fit'}</h2>
               <label class="row" style="font-size:14px"><span class="muted">Sort by</span><select id="sort" class="select sm" style="width:auto" value=${f.sort} onChange=${e => { f.sort = e.target.value; Store.save(); }}>
                 <option value="match">Best fit</option><option value="distance">Nearest</option><option value="size">Most students</option><option value="name">Name</option></select></label></div>
@@ -156,6 +157,22 @@ function Find() {
       </div>
     </section>
   </main>`;
+}
+
+// Find one school you already know, whether or not it made the list, and see why
+function NameFind({ list }) {
+  const [q, setQ] = useState('');
+  const words = q.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').split(' ').filter(w => w.length > 1);
+  const rank = new Map(list.map((e, i) => [e.s.id, i + 1]));
+  const hits = words.length ? S.schools.filter(s => { const n = s.n.toLowerCase(); return words.every(w => n.includes(w)); }).sort((a, b) => (rank.get(a.id) || 1e9) - (rank.get(b.id) || 1e9)).slice(0, 8) : [];
+  return html`<div class="panel" style="margin-bottom:16px">
+    <label class="field"><span>Know a school already? Find it by name</span>
+      <input id="namefind" class="input sm" placeholder="e.g. Jaipuria or Kendriya Vidyalaya" value=${q} onInput=${e => setQ(e.target.value)}/></label>
+    ${words.length ? hits.length ? html`<div class="addr-list">${hits.map(s => { const r = rank.get(s.id), why = r ? [] : whyHidden(s, child(), S.home, filters());
+        return html`<button class="addr-opt" onClick=${() => { S.open = s; emit(); }}><b>${s.n}</b>
+          <small>${[s.loc, s.di].filter(Boolean).join(', ')} · ${r ? 'Number ' + r + ' in your list' : 'Not in your list: ' + (why[0] || 'hidden by a filter')}</small></button>`; })}</div>`
+      : html`<p class="faint" style="font-size:14px;margin:8px 0 0">No school in ${S.place.label} has that in its name in the government register. Try one word of the name, or a different spelling.</p>` : null}
+  </div>`;
 }
 
 function Drawer() {
@@ -183,6 +200,9 @@ function Drawer() {
       <div class="row" style="justify-content:space-between"><span class="label">${MG_LABEL[s.mg]}</span><button class="ibtn" aria-label="Close" onClick=${close}>${I('x')}</button></div>
       <h2>${s.n}</h2>
       <div class="muted">${[s.loc, s.di, s.state].filter(Boolean).join(', ')}${s.pin ? ' · PIN ' + s.pin : ''}</div>
+      ${(() => { const why = evaluate(s, child(), S.home, filters()) ? [] : whyHidden(s, child(), S.home, filters());
+        return why.length ? html`<div class="notice" style="margin:14px 0 0">${I('alert')}<span><b>Why it’s not in your list:</b> ${why.join('. ')}.${why.some(w => /km away|no map location/.test(w)) ? ' The government register’s map points are sometimes wrong. Check where it really is with “Open in Maps”, and widen the distance if it’s close to your home.' : ''}</span></div>` : null; })()}
+      ${s.fixed ? html`<div class="notice info" style="margin:14px 0 0">${I('info')}<span>The government register had this school in the wrong place on the map. SchoolSafar uses its real address instead.</span></div>` : null}
       <div class="chips">${e.score ? html`<span class="chip" style="background:var(--ink);color:var(--sheet)">Fit ${e.score}/100</span>` : null}${e.reasons.map(([k, t]) => html`<span class=${'chip ' + k}>${t}</span>`)}</div>
       <div class="row" style="margin-top:16px">
         <button class=${'btn ' + (sl ? '' : 'primary')} onClick=${() => shortlist(s)}>${I('star')}${sl ? 'On your shortlist' : 'Add to shortlist'}</button>

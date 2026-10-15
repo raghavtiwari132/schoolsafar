@@ -1,0 +1,3 @@
+{"note": "Map points corrected by hand where the UDISE+ register is far off. Key: UDISE code. Value: [lat, lon]. Source of each fix is noted in src.",
+ "d": {"9270700205": [26.7802, 81.0248]},
+ "src": {"9270700205": "Seth Anandram Jaipuria School, Sec-D Pocket-3, Ansal Sushant Golf City, Lucknow 226030 (school website). Register put it in Moti Nagar, 13.6 km away."}}
