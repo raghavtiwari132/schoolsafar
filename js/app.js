@@ -90,7 +90,7 @@ function Kids() {
 function Footer() {
   return html`<footer class="foot"><div class="wrap">
     <p>School information comes from <b>UDISE+</b>, the Ministry of Education’s register of every recognised school (“Basic Details of Schools” on the <a href="https://indiadataportal.com" target="_blank" rel="noopener">India Data Portal</a>, Government Open Data License – India)${S.idx ? ', loaded ' + S.idx.built : ''}. Some schools may be missing or have outdated details. Always confirm board, fees and seats with the school.</p>
-    <p>Distances are straight-line from your address or from the middle of the area you pick, not road distance.${CAN_WEB ? ' Address search and maps use OpenStreetMap (© OpenStreetMap contributors).' : ''} Fit scores are a guide from the details listed here, not a rating of school quality. SchoolSafar isn’t run by the government.</p>
+    <p>Distances are straight-line from your address or from the middle of the area you pick, not road distance. Where the register’s map point for a school was clearly wrong, SchoolSafar uses the school’s location from OpenStreetMap instead (© OpenStreetMap contributors, Open Database License).${CAN_WEB ? ' Address search and maps use OpenStreetMap (© OpenStreetMap contributors).' : ''} Fit scores are a guide from the details listed here, not a rating of school quality. SchoolSafar isn’t run by the government.</p>
   </div></footer>`;
 }
 

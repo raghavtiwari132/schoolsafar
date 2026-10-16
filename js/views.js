@@ -202,7 +202,7 @@ function Drawer() {
       <div class="muted">${[s.loc, s.di, s.state].filter(Boolean).join(', ')}${s.pin ? ' · PIN ' + s.pin : ''}</div>
       ${(() => { const why = evaluate(s, child(), S.home, filters()) ? [] : whyHidden(s, child(), S.home, filters());
         return why.length ? html`<div class="notice" style="margin:14px 0 0">${I('alert')}<span><b>Why it’s not in your list:</b> ${why.join('. ')}.${why.some(w => /km away|no map location/.test(w)) ? ' The government register’s map points are sometimes wrong. Check where it really is with “Open in Maps”, and widen the distance if it’s close to your home.' : ''}</span></div>` : null; })()}
-      ${s.fixed ? html`<div class="notice info" style="margin:14px 0 0">${I('info')}<span>The government register had this school in the wrong place on the map. SchoolSafar uses its real address instead.</span></div>` : null}
+      ${s.fixed ? html`<div class="notice info" style="margin:14px 0 0">${I('info')}<span>${s.fixed === 'osm' ? 'The government register had this school in the wrong place on the map. SchoolSafar uses its location from OpenStreetMap instead.' : 'The government register had this school in the wrong place on the map. SchoolSafar uses its real address instead.'}</span></div>` : null}
       <div class="chips">${e.score ? html`<span class="chip" style="background:var(--ink);color:var(--sheet)">Fit ${e.score}/100</span>` : null}${e.reasons.map(([k, t]) => html`<span class=${'chip ' + k}>${t}</span>`)}</div>
       <div class="row" style="margin-top:16px">
         <button class=${'btn ' + (sl ? '' : 'primary')} onClick=${() => shortlist(s)}>${I('star')}${sl ? 'On your shortlist' : 'Add to shortlist'}</button>

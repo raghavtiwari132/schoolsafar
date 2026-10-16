@@ -24,3 +24,5 @@ It is a plain static site: open `index.html` through any web server, or upload t
 School data: UDISE+ "Basic Details of Schools", Ministry of Education, Government of India, via the India Data Portal. Used under the [Government Open Data License – India](https://data.gov.in/government-open-data-license-india).
 
 Maps and address search: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
+
+Location corrections: where the register's map point for a school is clearly wrong, `data/c/*.json` uses the school's location from OpenStreetMap instead (these schools carry flag 16). The corrections come from the Humanitarian OpenStreetMap Team's [Education Facilities of India](https://data.humdata.org/dataset/hotosm_ind_education_facilities) export, © OpenStreetMap contributors, available under the [Open Database License](https://opendatacommons.org/licenses/odbl/1-0/). The list of corrected points is in `data/osm_fixes.tsv`, and hand-checked fixes are in `data/fixes.json`.

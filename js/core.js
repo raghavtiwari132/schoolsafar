@@ -102,7 +102,7 @@ async function choosePlace(opt, keepArea) {
       blk.s.forEach(r => {
         const s = { n: r[0], id: r[1], lat: r[2] / 1e4, lon: r[3] / 1e4, cf: r[4], ct: r[5], fl: r[6], mg: r[7], bs: r[8], bh: r[9], t: r[10], st: r[11], y: r[12], pin: r[13], loc: r[14] >= 0 ? blk.l[r[14]] : '', rooms: r[15], di, state: st };
         if (!r[2]) { s.lat = 0; s.lon = 0; }
-        const fx = S.fixes && S.fixes[s.id]; if (fx) { s.lat = fx[0]; s.lon = fx[1]; s.fixed = true; }   // the register's map point is sometimes far off; corrections live in data/fixes.json
+        const fx = S.fixes && S.fixes[s.id]; if (fx) { s.lat = fx[0]; s.lon = fx[1]; s.fixed = 'hand'; } else if (s.fl & 16) s.fixed = 'osm';   // the register's map point is sometimes far off: fixed by hand in data/fixes.json, or from OpenStreetMap (flag 16)
         schools.push(s);
         if (s.lat) {
           if (s.loc) { const k = s.loc + '|' + di; const a = areas.get(k) || { label: s.loc, sub: di, n: 0, la: 0, lo: 0, kind: 'area' }; a.n++; a.la += s.lat; a.lo += s.lon; areas.set(k, a); }
